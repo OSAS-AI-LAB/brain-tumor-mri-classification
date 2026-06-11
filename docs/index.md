@@ -23,7 +23,8 @@
 │   └── download_model_checkpoints.py
 ├── requirements/
 │   ├── requirements-base.txt
-│   └── requirements-dev.txt
+│   ├── requirements-dev.txt
+│   └── requirements-torch-cuda.txt
 ├── notebooks/
 ├── data/dataset/
 ├── ckpts/
