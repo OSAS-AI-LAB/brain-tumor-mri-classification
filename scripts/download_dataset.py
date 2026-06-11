@@ -1,48 +1,58 @@
 import argparse
 import shutil
 import sys
-import zipfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 try:
-    import kaggle
+    import kagglehub
 except ImportError:
-    raise SystemExit("kaggle package not installed.\nInstall with: pip install kaggle")
+    raise SystemExit(
+        "kagglehub package not installed.\n"
+        "Install with: pip install kagglehub"
+    )
 
 from src.brain_tumor_mri_classification.config import Config
 
 
 def download_dataset(dataset: str, output_dir: Path, tmp_dir: Path):
-    tmp_dir.mkdir(parents=True, exist_ok=True)
-    print(f"Downloading dataset: {dataset}")
-    kaggle.api.dataset_download_files(dataset, path=str(tmp_dir), quiet=False)
-
-    zip_files = sorted(tmp_dir.glob("*.zip"), key=lambda p: p.stat().st_mtime, reverse=True)
-    if not zip_files:
-        raise FileNotFoundError(f"No zip file found in {tmp_dir}")
-
-    zip_path = zip_files[0]
+    """
+    Downloads and extracts a public Kaggle dataset without requiring an API token.
+    Note: tmp_dir is kept for signature compatibility but is unused, as kagglehub 
+    manages its own internal caching.
+    """
+    print(f"Downloading public dataset: {dataset} (No API token required)")
+    
+    # kagglehub automatically downloads and extracts the dataset to its local cache
+    cache_path = Path(kagglehub.dataset_download(dataset))
+    
     if output_dir.exists():
         print(f"Removing existing directory: {output_dir}")
         shutil.rmtree(output_dir)
+    
     output_dir.mkdir(parents=True, exist_ok=True)
-    print(f"Extracting {zip_path} -> {output_dir}")
-    with zipfile.ZipFile(zip_path, "r") as zf:
-        zf.extractall(output_dir)
-    print(f"Deleting zip: {zip_path}")
-    zip_path.unlink()
+    
+    print(f"Copying extracted files from {cache_path} to {output_dir}")
+    # Copy all contents from the kagglehub cache to the desired output directory
+    for item in cache_path.iterdir():
+        if item.is_dir():
+            shutil.copytree(item, output_dir / item.name, dirs_exist_ok=True)
+        else:
+            shutil.copy2(item, output_dir / item.name)
+            
     print("Done.")
-    print(f"Dataset extracted to: {output_dir}")
+    print(f"Dataset successfully prepared at: {output_dir}")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Download and extract a Kaggle dataset.")
+    parser = argparse.ArgumentParser(
+        description="Download and extract a public Kaggle dataset without an API token."
+    )
     parser.add_argument("--data-config", default=None, help="Path to data YAML config")
-    parser.add_argument("--input", default=None, help="Kaggle dataset slug (e.g. owner/name)")
+    parser.add_argument("--input", default=None, help="Kaggle dataset slug (e.g., owner/name)")
     parser.add_argument("--output", default=None, help="Extraction directory")
-    parser.add_argument("--tmp", default="tmp", help="Temporary download directory")
+    parser.add_argument("--tmp", default="tmp", help="Temporary directory (unused by kagglehub, kept for compatibility)")
     args = parser.parse_args()
 
     if args.data_config and Path(args.data_config).exists():

@@ -1,4 +1,4 @@
 -r requirements-base.txt
 
 gradio>=4.0
-kaggle>=1.5
+kagglehub>=1.0.0
