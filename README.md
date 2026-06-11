@@ -1,67 +1,46 @@
 # MRI Classification
 
-A compact brain tumor MRI classification project using a [30-class Kaggle dataset](https://www.kaggle.com/datasets/fernando2rad/brain-tumor-mri-images-30-classes) with DINOv2 (ViT-B/14) fine-tuning in PyTorch.
-
-## Project Structure
+Brain tumor MRI classification using a [30-class Kaggle dataset](https://www.kaggle.com/datasets/fernando2rad/brain-tumor-mri-images-30-classes) with DINOv2 (ViT-B/14) fine-tuning in PyTorch.
 
 ```
-├── configs/
-│   ├── data.yml                 # Data paths, checkpoint paths, normalization
-│   └── DINOv2_model_configs.yml # Model architecture & training hyperparams
-├── src/brain_tumor_mri_classification/  # Core Python package
-│   ├── config.py          # Config dataclass + multi-YAML loader
-│   ├── dataset.py         # Dataset, transforms, dataloaders
-│   ├── model.py           # DINOv2Classifier definition
-│   ├── trainer.py         # Training & validation loops
-│   ├── evaluate.py        # Evaluation metrics & confusion matrix
-│   └── inference.py       # Predictor class for inference
-├── apps/
-│   ├── cli/main.py        # CLI: train / evaluate / inference
-│   └── gradio_app/main.py # Web UI for interactive inference
-├── notebooks/
-│   └── training_notebook.ipynb  # Original training notebook
+├── configs/                           # YAML config files
+├── src/brain_tumor_mri_classification/  # Core package
+├── apps/cli/main.py                   # CLI
+├── apps/gradio_app/main.py            # Web UI
 ├── scripts/
-│   └── download_kaggle_dataset.py  # Dataset downloader
-├── data/dataset/          # Dataset root (gitignored)
-├── ckpts/                 # Model checkpoints (gitignored)
-└── docs/                  # Documentation
+│   ├── download_dataset.py            # Dataset downloader
+│   └── download_model_checkpoints.py  # Backbone downloader
+├── notebooks/
+├── data/dataset/                      # Dataset (gitignored)
+├── ckpts/                             # Checkpoints (gitignored)
+└── docs/
+    ├── setup.md
+    ├── configuration.md
+    ├── usage.md
+    ├── augmentation.md
+    └── api.md
 ```
 
 ## Quick Start
 
 ```bash
-pip install torch torchvision pillow scikit-learn matplotlib numpy gradio pyyaml
+pip install torch torchvision pillow scikit-learn matplotlib numpy gradio pyyaml kaggle
 
-python scripts/download_kaggle_dataset.py
-
-# Train
+python scripts/download_dataset.py
+python scripts/download_model_checkpoints.py
 python apps/cli/main.py train
-
-# Evaluate
-python apps/cli/main.py evaluate \
-    --checkpoint ckpts/dinov2_brain_tumor/best_dinov2_brain_tumor.pth --cm confusion.png
-
-# Single image inference
-python apps/cli/main.py inference \
-    --checkpoint ckpts/dinov2_brain_tumor/best_dinov2_brain_tumor.pth --image path/to/mri.jpg
-
-# Web UI
+python apps/cli/main.py evaluate --checkpoint ckpts/dinov2_brain_tumor/best_dinov2_brain_tumor.pth --cm confusion.png
+python apps/cli/main.py inference --checkpoint ckpts/dinov2_brain_tumor/best_dinov2_brain_tumor.pth --image path/to/mri.jpg
 python apps/gradio_app/main.py
+python apps/cli/main.py export-onnx --checkpoint ckpts/dinov2_brain_tumor/best_dinov2_brain_tumor.pth --output model.onnx
 ```
 
-## Configuration
+## Documentation
 
-Settings are split into two YAML files. Both are loaded automatically from `configs/`.
-
-| File | Contents |
-|------|----------|
-| `configs/data.yml` | Data paths |
-| `configs/DINOv2_model_configs.yml` | Checkpoint paths, model architecture, training hyperparameters, normalization |
-
-CLI flags override YAML values when both are provided.
-
-```bash
-python apps/cli/main.py train --data-config configs/data.yml --model-config configs/DINOv2_model_configs.yml --epochs 20
-```
-
-See [docs/guide.md](docs/guide.md) for full usage and [docs/api.md](docs/api.md) for API reference.
+| Document | Contents |
+|----------|----------|
+| [Setup](docs/setup.md) | Install, dataset, backbone cache |
+| [Configuration](docs/configuration.md) | YAML config reference |
+| [Usage](docs/usage.md) | CLI, Gradio, ONNX |
+| [Augmentation](docs/augmentation.md) | Transform details |
+| [API Reference](docs/api.md) | Module API docs |

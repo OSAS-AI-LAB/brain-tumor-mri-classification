@@ -39,18 +39,20 @@ def download_dataset(dataset: str, output_dir: Path, tmp_dir: Path):
 
 def main():
     parser = argparse.ArgumentParser(description="Download and extract a Kaggle dataset.")
-    parser.add_argument("--data-config", default="configs/data.yml", help="Path to data YAML config")
-    parser.add_argument("--model-config", default="configs/DINOv2_model_configs.yml", help="Path to model YAML config")
-    parser.add_argument("--dataset", default=None, help="Kaggle dataset slug (overrides config)")
-    parser.add_argument("--output", default=None, help="Extraction directory (overrides config)")
+    parser.add_argument("--data-config", default=None, help="Path to data YAML config")
+    parser.add_argument("--input", default=None, help="Kaggle dataset slug (e.g. owner/name)")
+    parser.add_argument("--output", default=None, help="Extraction directory")
     parser.add_argument("--tmp", default="tmp", help="Temporary download directory")
     args = parser.parse_args()
 
-    config_paths = [p for p in [args.data_config, args.model_config] if Path(p).exists()]
-    cfg = Config.from_yaml(*config_paths) if config_paths else Config()
+    if args.data_config and Path(args.data_config).exists():
+        cfg = Config.from_yaml(args.data_config)
+        dataset = args.input or "/".join(cfg.dataset_url.split("/")[-2:])
+        output_dir = Path(args.output or cfg.img_dir)
+    else:
+        dataset = args.input or "fernando2rad/brain-tumor-mri-images-30-classes"
+        output_dir = Path(args.output or "data/dataset/brain-tumor-mri-images-30-classes")
 
-    dataset = args.dataset or "/".join(cfg.dataset_url.split("/")[-2:])
-    output_dir = Path(args.output or cfg.img_dir)
     download_dataset(dataset=dataset, output_dir=output_dir, tmp_dir=Path(args.tmp))
 
 

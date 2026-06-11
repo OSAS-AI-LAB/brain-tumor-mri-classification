@@ -3,52 +3,54 @@
 ## `brain_tumor_mri_classification.config`
 
 ### `Config`
-Dataclass holding all configuration defaults.
+Dataclass with defaults. Load from YAML via `from_yaml(*paths, overrides=None)`.
 
 ```python
-from brain_tumor_mri_classification.config import Config
-
-cfg = Config(
-    json_path="data/dataset/brain-tumor-mri-images-30-classes/DATA.json",
-    img_dir="data/dataset/brain-tumor-mri-images-30-classes",
-    img_size=518,
-    batch_size=16,
-    epochs=15,
-    lr=1e-3,
-)
+cfg = Config()
+cfg = Config.from_yaml("configs/data.yml", "configs/DINOv2_model_configs.yml")
+cfg = Config.from_yaml(overrides={"epochs": 20})
 ```
+
+| Field | Type | Default |
+|-------|------|---------|
+| `dataset_url` | `str` | Kaggle URL |
+| `json_path` | `str` | `data/.../DATA.json` |
+| `img_dir` | `str` | `data/...` |
+| `checkpoint_dir` | `str` | `ckpts/dinov2_brain_tumor` |
+| `best_model_path` | `str` | `ckpts/.../best.pth` |
+| `backbone_name` | `str` | `dinov2_vitb14` |
+| `backbone_cache_path` | `str` | `ckpts/...-dinov2_vitb14` |
+| `hidden_dim` | `int` | 512 |
+| `dropout` | `float` | 0.4 |
+| `img_size` | `int` | 518 |
+| `batch_size` | `int` | 16 |
+| `epochs` | `int` | 15 |
+| `lr` | `float` | 1e-3 |
+| `weight_decay` | `float` | 1e-4 |
+| `val_split` | `float` | 0.2 |
+| `seed` | `int` | 42 |
+| `num_workers` | `int` | 2 |
+| `pin_memory` | `bool` | True |
+| `mean` | `tuple` | (0.485, 0.456, 0.406) |
+| `std` | `tuple` | (0.229, 0.224, 0.225) |
 
 ---
 
 ## `brain_tumor_mri_classification.dataset`
 
 ### `BrainTumorDataset`
-PyTorch `Dataset` for brain tumor MRI images.
-
 ```python
-from brain_tumor_mri_classification.dataset import BrainTumorDataset
-
-dataset = BrainTumorDataset(dataset_info, class_to_idx, transform=val_transform)
-img, label = dataset[0]
+ds = BrainTumorDataset(dataset_info, class_to_idx, transform=val_transform)
+img, label = ds[0]
 ```
 
 ### `load_dataset_info(json_path, img_dir)`
-Loads image paths and class labels from `DATA.json`.
-
 Returns `(dataset_info, classes_list, class_to_idx)`.
 
-| Return | Type | Description |
-|--------|------|-------------|
-| `dataset_info` | `list[dict]` | `[{"img_path": str, "class": str}, ...]` |
-| `classes_list` | `list[str]` | Sorted unique class names |
-| `class_to_idx` | `dict[str, int]` | Class name → integer index |
-
 ### `build_transforms(cfg)`
-Returns `(train_transform, val_transform)` composed `torchvision.transforms`.
+Returns `(train_transform, val_transform)`.
 
 ### `create_dataloaders(cfg)`
-Creates train/val DataLoaders with stratified split.
-
 Returns `(train_loader, val_loader, classes_list, class_to_idx)`.
 
 ---
@@ -56,66 +58,67 @@ Returns `(train_loader, val_loader, classes_list, class_to_idx)`.
 ## `brain_tumor_mri_classification.model`
 
 ### `DINOv2Classifier`
-DINOv2 backbone + MLP classification head.
-
 ```python
 model = DINOv2Classifier(backbone, num_classes=30, hidden_dim=512, dropout=0.4)
-logits = model(images)  # (batch, num_classes)
+logits = model(images)
 ```
 
+### `_load_backbone(cfg, device)`
+Loads backbone from `cfg.backbone_cache_path`, or downloads via hub and caches.
+
 ### `build_model(cfg, num_classes, device)`
-Loads DINOv2 backbone from torch hub, freezes it, wraps in `DINOv2Classifier`.
+Loads backbone, freezes it, wraps in `DINOv2Classifier`.
 
 ### `load_checkpoint(model, checkpoint_path, device)`
-Loads saved state dict into model.
+Loads state dict.
 
 ---
 
 ## `brain_tumor_mri_classification.trainer`
 
-### `train_one_epoch(model, loader, criterion, optimizer, device)`
-Runs one training epoch. Returns `(avg_loss, accuracy)`.
+### `train_one_epoch(model, loader, criterion, optimizer, device)` → `(loss, acc)`
 
-### `validate(model, loader, criterion, device)`
-Runs validation. Returns `(avg_loss, accuracy)`.
+### `validate(model, loader, criterion, device)` → `(loss, acc)`
 
-### `run_training(model, train_loader, val_loader, cfg, device)`
-Full training loop with LR scheduling and best-model checkpointing. Returns `best_val_acc`.
+### `run_training(model, train_loader, val_loader, cfg, device)` → `best_val_acc`
 
 ---
 
 ## `brain_tumor_mri_classification.evaluate`
 
-### `evaluate_model(model, loader, classes_list, device)`
-Collects predictions and returns metrics dict:
+### `evaluate_model(model, loader, classes_list, device)` → `dict`
 
-```python
-result = evaluate_model(model, val_loader, classes_list, device)
-# result["report"]      → dict (sklearn classification_report output_dict=True)
-# result["report_str"]  → str  (formatted text report)
-# result["cm"]          → np.ndarray (confusion matrix)
-# result["y_true"]      → list[int]
-# result["y_pred"]      → list[int]
-```
+Returns `report`, `report_str`, `cm`, `y_true`, `y_pred`.
 
 ### `plot_confusion_matrix(cm, classes_list, save_path)`
-Saves a matplotlib confusion matrix heatmap to `save_path`.
+Saves heatmap PNG.
 
 ---
 
 ## `brain_tumor_mri_classification.inference`
 
 ### `Predictor`
-High-level inference wrapper.
-
 ```python
-predictor = Predictor(model, classes_list, cfg, device)
-label, confidence = predictor.predict(image)         # top-1
-top5 = predictor.predict_top_k(image, k=5)           # [(label, prob), ...]
+p = Predictor(model, classes_list, cfg, device)
+label, conf = p.predict(image)
+top5 = p.predict_top_k(image, k=5)
 ```
 
-### `build_predictor(checkpoint_path, classes_list, cfg, device)`
-Loads a checkpoint and returns a ready-to-use `Predictor`.
+### `build_predictor(checkpoint_path, classes_list, cfg, device)` → `Predictor`
 
-### `build_inference_transform(cfg)`
-Returns the inference-only transform (resize + normalize).
+### `build_inference_transform(cfg)` → `Compose`
+
+---
+
+## `brain_tumor_mri_classification.utils`
+
+### `set_seed(seed)`
+Seeds Python, NumPy, PyTorch, CUDA.
+
+### `count_parameters(model)` → `{total, trainable}`
+
+### `export_to_onnx(checkpoint_path, classes_list, cfg, output_path, device, opset_version)`
+
+```python
+export_to_onnx(checkpoint_path="ckpts/.../best.pth", classes_list=classes_list, cfg=cfg, output_path="model.onnx")
+```
