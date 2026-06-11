@@ -22,17 +22,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-DEFAULT_DATA_CONFIG = "configs/data.yml"
-DEFAULT_MODEL_CONFIG = "configs/DINOv2_model_configs.yml"
 
-
-def _load_cfg(args) -> Config:
+def _load_cfg(data_config: str | None, model_config: str | None, overrides: dict | None = None) -> Config:
     paths = []
-    if args.data_config and Path(args.data_config).exists():
-        paths.append(args.data_config)
-    if args.model_config and Path(args.model_config).exists():
-        paths.append(args.model_config)
-    return Config.from_yaml(*paths, overrides=getattr(args, "overrides", None))
+    if data_config:
+        paths.append(data_config)
+    if model_config:
+        paths.append(model_config)
+    return Config.from_yaml(*paths, overrides=overrides)
 
 
 def cmd_train(args):
@@ -45,8 +42,7 @@ def cmd_train(args):
         "epochs": args.epochs,
         "lr": args.lr,
     }
-    args.overrides = overrides
-    cfg = _load_cfg(args)
+    cfg = _load_cfg(args.data_config, args.model_config, overrides)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info("Device: %s", device)
 
@@ -59,12 +55,8 @@ def cmd_train(args):
 
 
 def cmd_evaluate(args):
-    overrides = {
-        "json_path": args.json,
-        "img_dir": args.img_dir,
-    }
-    args.overrides = overrides
-    cfg = _load_cfg(args)
+    overrides = {"json_path": args.json, "img_dir": args.img_dir}
+    cfg = _load_cfg(args.data_config, None, overrides)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info("Device: %s", device)
 
@@ -79,13 +71,8 @@ def cmd_evaluate(args):
 
 
 def cmd_inference(args):
-    overrides = {
-        "json_path": args.json or None,
-        "img_dir": args.img_dir or None,
-        "img_size": args.img_size,
-    }
-    args.overrides = overrides
-    cfg = _load_cfg(args)
+    overrides = {"json_path": args.json or None, "img_dir": args.img_dir or None, "img_size": args.img_size}
+    cfg = _load_cfg(args.data_config, args.model_config, overrides)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info("Device: %s", device)
 
@@ -102,12 +89,8 @@ def cmd_inference(args):
 
 
 def cmd_export_onnx(args):
-    overrides = {
-        "json_path": args.json or None,
-        "img_dir": args.img_dir or None,
-    }
-    args.overrides = overrides
-    cfg = _load_cfg(args)
+    overrides = {"json_path": args.json or None, "img_dir": args.img_dir or None}
+    cfg = _load_cfg(args.data_config, args.model_config, overrides)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info("Device: %s", device)
 
@@ -124,17 +107,13 @@ def cmd_export_onnx(args):
     )
 
 
-def _add_global_args(parser):
-    parser.add_argument("--data-config", default=DEFAULT_DATA_CONFIG, help="Path to data YAML config")
-    parser.add_argument("--model-config", default=DEFAULT_MODEL_CONFIG, help="Path to model YAML config")
-
-
 def main():
     parser = argparse.ArgumentParser(description="Brain Tumor MRI Classification CLI")
-    _add_global_args(parser)
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_train = sub.add_parser("train")
+    p_train.add_argument("--data-config", default="configs/data.yml")
+    p_train.add_argument("--model-config", default="configs/DINOv2_vitb14_model_configs.yml")
     p_train.add_argument("--json")
     p_train.add_argument("--img-dir")
     p_train.add_argument("--ckpt-dir")
@@ -144,6 +123,7 @@ def main():
     p_train.set_defaults(func=cmd_train)
 
     p_eval = sub.add_parser("evaluate")
+    p_eval.add_argument("--data-config", default="configs/data.yml")
     p_eval.add_argument("--checkpoint", required=True)
     p_eval.add_argument("--json")
     p_eval.add_argument("--img-dir")
@@ -151,6 +131,8 @@ def main():
     p_eval.set_defaults(func=cmd_evaluate)
 
     p_infer = sub.add_parser("inference")
+    p_infer.add_argument("--data-config", default="configs/data.yml")
+    p_infer.add_argument("--model-config", default="configs/DINOv2_vitb14_model_configs.yml")
     p_infer.add_argument("--checkpoint", required=True)
     p_infer.add_argument("--image", required=True)
     p_infer.add_argument("--json")
@@ -160,6 +142,8 @@ def main():
     p_infer.set_defaults(func=cmd_inference)
 
     p_export = sub.add_parser("export-onnx")
+    p_export.add_argument("--data-config", default="configs/data.yml")
+    p_export.add_argument("--model-config", default="configs/DINOv2_vitb14_model_configs.yml")
     p_export.add_argument("--checkpoint", required=True)
     p_export.add_argument("--output", default="model.onnx", help="Output ONNX path")
     p_export.add_argument("--json")

@@ -1,33 +1,42 @@
 # Configuration
 
-Two YAML files in `configs/` are loaded automatically. CLI flags override YAML values.
+Config names are resolved from `configs/` automatically. CLI flags override YAML values.
 
 ```
-python apps/cli/main.py train --lr 5e-4 --epochs 20
+python apps/cli/main.py train --model-config DINOv2_large_model_configs.yml --lr 5e-4
 ```
 
-Files are merged left-to-right via `Config.from_yaml(*paths)`.
+## Data Config
 
-## `configs/data.yml`
+`configs/data.yml`:
 
 | Key | Field | Default | Description |
 |-----|-------|---------|-------------|
-| `data.dataset_url` | `dataset_url` | `https://www.kaggle.com/datasets/fernando2rad/brain-tumor-mri-images-30-classes` | Kaggle dataset URL |
+| `data.dataset_url` | `dataset_url` | Kaggle URL | Dataset URL |
 | `data.json_path` | `json_path` | `data/.../DATA.json` | Dataset metadata JSON |
 | `data.img_dir` | `img_dir` | `data/...` | Image root directory |
 
-## `configs/DINOv2_model_configs.yml`
+## Model Config Variants
+
+| Config File | Backbone | Embed Dim | Hidden Dim | Batch Size |
+|-------------|----------|-----------|------------|------------|
+| `DINOv2_small_model_configs.yml` | `dinov2_vits14` | 384 | 256 | 32 |
+| `DINOv2_vitb14_model_configs.yml` | `dinov2_vitb14` | 768 | 512 | 16 |
+| `DINOv2_large_model_configs.yml` | `dinov2_vitl14` | 1024 | 768 | 8 |
+| `DINOv2_giant_model_configs.yml` | `dinov2_vitg14` | 1536 | 1024 | 4 |
+
+### Common Fields
 
 | Key | Field | Default | Description |
 |-----|-------|---------|-------------|
 | `checkpoint.checkpoint_dir` | `checkpoint_dir` | `ckpts/dinov2_brain_tumor` | Checkpoint save dir |
-| `checkpoint.best_model_path` | `best_model_path` | `ckpts/.../best_dinov2_brain_tumor.pth` | Best model path |
-| `model.backbone_name` | `backbone_name` | `dinov2_vitb14` | DINOv2 variant |
-| `model.backbone_cache_path` | `backbone_cache_path` | `ckpts/...-dinov2_vitb14` | Backbone cache path |
-| `model.hidden_dim` | `hidden_dim` | 512 | MLP hidden size |
+| `checkpoint.best_model_path` | `best_model_path` | `ckpts/.../best_*.pth` | Best model path |
+| `model.backbone_name` | `backbone_name` | *per variant* | DINOv2 variant |
+| `model.backbone_cache_path` | `backbone_cache_path` | `ckpts/...-*` | Backbone cache path |
+| `model.hidden_dim` | `hidden_dim` | *per variant* | MLP hidden size |
 | `model.dropout` | `dropout` | 0.4 | Dropout rate |
 | `training.img_size` | `img_size` | 518 | Resize dimension |
-| `training.batch_size` | `batch_size` | 16 | Batch size |
+| `training.batch_size` | `batch_size` | *per variant* | Batch size |
 | `training.epochs` | `epochs` | 15 | Training epochs |
 | `training.lr` | `lr` | 1e-3 | Learning rate |
 | `training.weight_decay` | `weight_decay` | 1e-4 | AdamW weight decay |

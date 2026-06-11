@@ -12,7 +12,7 @@ from brain_tumor_mri_classification.dataset import load_dataset_info
 from brain_tumor_mri_classification.inference import build_predictor
 
 DEFAULT_DATA_CONFIG = "configs/data.yml"
-DEFAULT_MODEL_CONFIG = "configs/DINOv2_model_configs.yml"
+DEFAULT_MODEL_CONFIG = "configs/DINOv2_vitb14_model_configs.yml"
 DEFAULT_CHECKPOINT = "ckpts/dinov2_brain_tumor/best_dinov2_brain_tumor.pth"
 
 

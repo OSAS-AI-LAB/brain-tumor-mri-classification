@@ -24,7 +24,7 @@ def download_backbone(backbone_name: str, cache_path: str):
 
 def main():
     parser = argparse.ArgumentParser(description="Download DINOv2 backbone model to local cache.")
-    parser.add_argument("--model-config", default=None, help="Path to model YAML config")
+    parser.add_argument("--model-config", default="configs/DINOv2_vitb14_model_configs.yml", help="Path to model YAML config")
     parser.add_argument("--input", default=None, help="DINOv2 variant (e.g. dinov2_vitb14)")
     parser.add_argument("--output", default=None, help="Local cache path for backbone")
     args = parser.parse_args()

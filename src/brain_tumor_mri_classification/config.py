@@ -37,6 +37,18 @@ class Config:
         except ImportError:
             raise ImportError("PyYAML is required. Install with: pip install pyyaml")
 
+        configs_dir = Path(__file__).resolve().parents[2] / "configs"
+
+        resolved = []
+        for p in paths:
+            path = Path(p)
+            if path.exists():
+                resolved.append(str(path))
+            else:
+                alt = configs_dir / p
+                if alt.exists():
+                    resolved.append(str(alt))
+
         mapping = {
             "dataset_url": ("data", "dataset_url"),
             "json_path": ("data", "json_path"),
@@ -62,7 +74,7 @@ class Config:
 
         cfg = cls()
 
-        for path in paths:
+        for path in resolved:
             with open(path, encoding="utf-8") as f:
                 raw = yaml.safe_load(f)
             for field_name, keys in mapping.items():

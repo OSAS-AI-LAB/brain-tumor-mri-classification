@@ -5,9 +5,11 @@
 ### `Config`
 Dataclass with defaults. Load from YAML via `from_yaml(*paths, overrides=None)`.
 
+Paths are resolved from `configs/` folder automatically.
+
 ```python
 cfg = Config()
-cfg = Config.from_yaml("configs/data.yml", "configs/DINOv2_model_configs.yml")
+cfg = Config.from_yaml("data.yml", "DINOv2_vitb14_model_configs.yml")
 cfg = Config.from_yaml(overrides={"epochs": 20})
 ```
 
@@ -44,14 +46,11 @@ ds = BrainTumorDataset(dataset_info, class_to_idx, transform=val_transform)
 img, label = ds[0]
 ```
 
-### `load_dataset_info(json_path, img_dir)`
-Returns `(dataset_info, classes_list, class_to_idx)`.
+### `load_dataset_info(json_path, img_dir)` → `(dataset_info, classes_list, class_to_idx)`
 
-### `build_transforms(cfg)`
-Returns `(train_transform, val_transform)`.
+### `build_transforms(cfg)` → `(train_transform, val_transform)`
 
-### `create_dataloaders(cfg)`
-Returns `(train_loader, val_loader, classes_list, class_to_idx)`.
+### `create_dataloaders(cfg)` → `(train_loader, val_loader, classes_list, class_to_idx)`
 
 ---
 
@@ -66,11 +65,10 @@ logits = model(images)
 ### `_load_backbone(cfg, device)`
 Loads backbone from `cfg.backbone_cache_path`, or downloads via hub and caches.
 
-### `build_model(cfg, num_classes, device)`
-Loads backbone, freezes it, wraps in `DINOv2Classifier`.
+### `build_model(cfg, num_classes, device)` → `DINOv2Classifier`
+Loads backbone, freezes it, wraps in classifier head.
 
 ### `load_checkpoint(model, checkpoint_path, device)`
-Loads state dict.
 
 ---
 
@@ -91,7 +89,6 @@ Loads state dict.
 Returns `report`, `report_str`, `cm`, `y_true`, `y_pred`.
 
 ### `plot_confusion_matrix(cm, classes_list, save_path)`
-Saves heatmap PNG.
 
 ---
 
@@ -118,7 +115,6 @@ Seeds Python, NumPy, PyTorch, CUDA.
 ### `count_parameters(model)` → `{total, trainable}`
 
 ### `export_to_onnx(checkpoint_path, classes_list, cfg, output_path, device, opset_version)`
-
 ```python
 export_to_onnx(checkpoint_path="ckpts/.../best.pth", classes_list=classes_list, cfg=cfg, output_path="model.onnx")
 ```
