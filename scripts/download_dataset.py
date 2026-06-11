@@ -19,13 +19,15 @@ from src.brain_tumor_mri_classification.config import Config
 def download_dataset(dataset: str, output_dir: Path, tmp_dir: Path):
     """
     Downloads and extracts a public Kaggle dataset without requiring an API token.
-    Note: tmp_dir is kept for signature compatibility but is unused, as kagglehub 
-    manages its own internal caching.
+    The dataset is first downloaded and extracted to tmp_dir, then copied to output_dir.
     """
     print(f"Downloading public dataset: {dataset} (No API token required)")
     
-    # kagglehub automatically downloads and extracts the dataset to its local cache
-    cache_path = Path(kagglehub.dataset_download(dataset))
+    # Ensure tmp_dir exists and use it as the download/extraction path
+    tmp_dir.mkdir(parents=True, exist_ok=True)
+    
+    # kagglehub downloads and extracts the dataset directly to the specified tmp_dir
+    cache_path = Path(kagglehub.dataset_download(dataset, path=str(tmp_dir)))
     
     if output_dir.exists():
         print(f"Removing existing directory: {output_dir}")
@@ -34,12 +36,16 @@ def download_dataset(dataset: str, output_dir: Path, tmp_dir: Path):
     output_dir.mkdir(parents=True, exist_ok=True)
     
     print(f"Copying extracted files from {cache_path} to {output_dir}")
-    # Copy all contents from the kagglehub cache to the desired output directory
+    # Copy all contents from the tmp_dir to the desired output directory
     for item in cache_path.iterdir():
         if item.is_dir():
             shutil.copytree(item, output_dir / item.name, dirs_exist_ok=True)
         else:
             shutil.copy2(item, output_dir / item.name)
+            
+    # Optional: Uncomment the lines below if you want to clean up the tmp_dir after copying
+    # print(f"Cleaning up temporary directory: {tmp_dir}")
+    # shutil.rmtree(tmp_dir)
             
     print("Done.")
     print(f"Dataset successfully prepared at: {output_dir}")
@@ -52,7 +58,7 @@ def main():
     parser.add_argument("--data-config", default=None, help="Path to data YAML config")
     parser.add_argument("--input", default=None, help="Kaggle dataset slug (e.g., owner/name)")
     parser.add_argument("--output", default=None, help="Extraction directory")
-    parser.add_argument("--tmp", default="tmp", help="Temporary directory (unused by kagglehub, kept for compatibility)")
+    parser.add_argument("--tmp", default="tmp", help="Temporary directory for initial download and extraction")
     args = parser.parse_args()
 
     if args.data_config and Path(args.data_config).exists():
