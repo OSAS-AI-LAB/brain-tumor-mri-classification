@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 from brain_tumor_mri_classification.config import Config
 
@@ -24,7 +25,8 @@ def train_one_epoch(
     correct = 0
     total = 0
 
-    for images, labels in loader:
+    pbar = tqdm(loader, desc="Train", leave=False)
+    for images, labels in pbar:
         images, labels = images.to(device), labels.to(device)
         optimizer.zero_grad()
         outputs = model(images)
@@ -36,6 +38,8 @@ def train_one_epoch(
         _, preds = torch.max(outputs, 1)
         total += labels.size(0)
         correct += (preds == labels).sum().item()
+
+        pbar.set_postfix(loss=loss.item())
 
     return total_loss / total, correct / total
 
@@ -52,7 +56,8 @@ def validate(
     correct = 0
     total = 0
 
-    for images, labels in loader:
+    pbar = tqdm(loader, desc="Val", leave=False)
+    for images, labels in pbar:
         images, labels = images.to(device), labels.to(device)
         outputs = model(images)
         loss = criterion(outputs, labels)
@@ -61,6 +66,8 @@ def validate(
         _, preds = torch.max(outputs, 1)
         total += labels.size(0)
         correct += (preds == labels).sum().item()
+
+        pbar.set_postfix(loss=loss.item())
 
     return total_loss / total, correct / total
 

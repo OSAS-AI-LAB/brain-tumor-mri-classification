@@ -6,7 +6,7 @@ checkpoint:
 
 model:
   backbone_name: "dinov2_vitl14"
-  backbone_cache_path: "ckpts/facebookresearch--dinov2-dinov2_vitl14"
+  backbone_cache_path: "ckpts/facebookresearch--dinov2-dinov2_vitl14.pth"
   hidden_dim: 768
   dropout: 0.4
 
