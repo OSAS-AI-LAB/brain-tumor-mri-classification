@@ -1,4 +1,10 @@
--r requirements-base.txt
+-r requirements-cu128.txt
+tqdm>=4.64
+Pillow>=9.0
+scikit-learn>=1.0
+matplotlib>=3.5
+numpy>=1.21
+PyYAML>=6.0
 
 gradio>=4.0
 kagglehub>=1.0.0
