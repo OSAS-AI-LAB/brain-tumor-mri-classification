@@ -27,7 +27,12 @@ def _load_backbone(cfg: Config, device: torch.device) -> nn.Module:
     backbone = torch.hub.load("facebookresearch/dinov2", cfg.backbone_name)
     local_path = cfg.backbone_cache_path
     if os.path.exists(local_path):
-        state = torch.load(local_path, map_location=device, weights_only=True)
+        try:
+            state = torch.load(local_path, map_location=device, weights_only=True)
+        except Exception:
+            state = torch.load(local_path, map_location=device, weights_only=False).state_dict()
+            os.makedirs(os.path.dirname(local_path), exist_ok=True)
+            torch.save(state, local_path)
         backbone.load_state_dict(state)
     else:
         os.makedirs(os.path.dirname(local_path), exist_ok=True)
