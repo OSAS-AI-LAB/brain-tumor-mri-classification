@@ -46,7 +46,6 @@ def main():
         outputs=gr.Markdown(label="Result"),
         title="Brain Tumor MRI Classification",
         description=f"Upload a brain MRI image. The model predicts across {len(classes_list)} tumor classes using DINOv2.",
-        allow_flagging="never",
     )
 
     demo.launch(server_port=args.port, share=args.share)
