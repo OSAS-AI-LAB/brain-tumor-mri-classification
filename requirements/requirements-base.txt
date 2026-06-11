@@ -1,4 +1,4 @@
--r requirements-cu128.txt
+-r requirements-torch-cuda.txt
 tqdm>=4.64
 Pillow>=9.0
 scikit-learn>=1.0
