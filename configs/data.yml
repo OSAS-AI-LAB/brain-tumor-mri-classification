@@ -1,0 +1,5 @@
+data:
+  dataset_url: "https://www.kaggle.com/datasets/fernando2rad/brain-tumor-mri-images-30-classes"
+  json_path: "data/dataset/brain-tumor-mri-images-30-classes/DATA.json"
+  img_dir: "data/dataset/brain-tumor-mri-images-30-classes"
+

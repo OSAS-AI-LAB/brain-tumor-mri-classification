@@ -1,0 +1,24 @@
+checkpoint:
+  checkpoint_dir: "ckpts/dinov2_brain_tumor"
+  best_model_path: "ckpts/dinov2_brain_tumor/best_dinov2_brain_tumor.pth"
+
+model:
+  backbone_name: "dinov2_vitb14"
+  backbone_cache_path: "ckpts/facebookresearch--dinov2-dinov2_vitb14"
+  hidden_dim: 512
+  dropout: 0.4
+
+training:
+  img_size: 518
+  batch_size: 16
+  epochs: 15
+  lr: 0.001
+  weight_decay: 0.0001
+  val_split: 0.2
+  seed: 42
+  num_workers: 2
+  pin_memory: true
+
+normalization:
+  mean: [0.485, 0.456, 0.406]
+  std: [0.229, 0.224, 0.225]
