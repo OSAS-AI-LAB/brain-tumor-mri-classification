@@ -18,7 +18,7 @@ def download_backbone(backbone_name: str, cache_path: str):
     print(f"Downloading DINOv2 backbone: {backbone_name}")
     backbone = torch.hub.load("facebookresearch/dinov2", backbone_name)
     os.makedirs(os.path.dirname(cache_path), exist_ok=True)
-    torch.save(backbone, cache_path)
+    torch.save(backbone.state_dict(), cache_path)
     print(f"Backbone saved to: {cache_path}")
 
 

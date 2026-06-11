@@ -24,13 +24,15 @@ class DINOv2Classifier(nn.Module):
 
 
 def _load_backbone(cfg: Config, device: torch.device) -> nn.Module:
+    backbone = torch.hub.load("facebookresearch/dinov2", cfg.backbone_name)
     local_path = cfg.backbone_cache_path
     if os.path.exists(local_path):
-        return torch.load(local_path, map_location=device, weights_only=False)
-    backbone = torch.hub.load("facebookresearch/dinov2", cfg.backbone_name)
-    os.makedirs(os.path.dirname(local_path), exist_ok=True)
-    torch.save(backbone, local_path)
-    return backbone
+        state = torch.load(local_path, map_location=device, weights_only=True)
+        backbone.load_state_dict(state)
+    else:
+        os.makedirs(os.path.dirname(local_path), exist_ok=True)
+        torch.save(backbone.state_dict(), local_path)
+    return backbone.to(device)
 
 
 def build_model(cfg: Config, num_classes: int, device: torch.device) -> DINOv2Classifier:
