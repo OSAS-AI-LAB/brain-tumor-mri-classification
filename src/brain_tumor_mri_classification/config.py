@@ -9,14 +9,14 @@ class Config:
     json_path: str = "data/dataset/brain-tumor-mri-images-30-classes/DATA.json"
     img_dir: str = "data/dataset/brain-tumor-mri-images-30-classes"
     checkpoint_dir: str = "ckpts/dinov2_brain_tumor"
-    best_model_path: str = "ckpts/dinov2_brain_tumor/best_dinov2_brain_tumor.pth"
+    best_model_path: str = "ckpts/dinov2_brain_tumor/best_dinov2_vitl14_brain_tumor.pth"
 
     img_size: int = 518
-    batch_size: int = 16
+    batch_size: int = 8
     epochs: int = 15
     lr: float = 1e-3
     weight_decay: float = 1e-4
-    hidden_dim: int = 512
+    hidden_dim: int = 768
     dropout: float = 0.4
     val_split: float = 0.2
     seed: int = 42
@@ -24,8 +24,8 @@ class Config:
     num_workers: int = 2
     pin_memory: bool = True
 
-    backbone_name: str = "dinov2_vitb14"
-    backbone_cache_path: str = "ckpts/facebookresearch--dinov2-dinov2_vitb14"
+    backbone_name: str = "dinov2_vitl14"
+    backbone_cache_path: str = "ckpts/facebookresearch--dinov2-dinov2_vitl14"
 
     mean: tuple = field(default_factory=lambda: (0.485, 0.456, 0.406))
     std: tuple = field(default_factory=lambda: (0.229, 0.224, 0.225))

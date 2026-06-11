@@ -25,14 +25,14 @@ Config names are resolved from the `configs/` folder automatically, so `data.yml
 Pre-download the DINOv2 backbone to avoid torch hub fetch at runtime.
 
 ```bash
-# With config (default: vitb14)
-python scripts/download_model_checkpoints.py --model-config DINOv2_vitb14_model_configs.yml
-
-# With a different variant
+# With config (default: large)
 python scripts/download_model_checkpoints.py --model-config DINOv2_large_model_configs.yml
 
+# With a different variant
+python scripts/download_model_checkpoints.py --model-config DINOv2_small_model_configs.yml
+
 # Without config
-python scripts/download_model_checkpoints.py --input dinov2_vitb14 --output ckpts/facebookresearch--dinov2-dinov2_vitb14
+python scripts/download_model_checkpoints.py --input dinov2_vitl14 --output ckpts/facebookresearch--dinov2-dinov2_vitl14
 ```
 
 Skips if the cache path already exists.

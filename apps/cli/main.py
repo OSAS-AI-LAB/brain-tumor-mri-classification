@@ -113,7 +113,7 @@ def main():
 
     p_train = sub.add_parser("train")
     p_train.add_argument("--data-config", default="configs/data.yml")
-    p_train.add_argument("--model-config", default="configs/DINOv2_vitb14_model_configs.yml")
+    p_train.add_argument("--model-config", default="configs/DINOv2_large_model_configs.yml")
     p_train.add_argument("--json")
     p_train.add_argument("--img-dir")
     p_train.add_argument("--ckpt-dir")
@@ -132,7 +132,7 @@ def main():
 
     p_infer = sub.add_parser("inference")
     p_infer.add_argument("--data-config", default="configs/data.yml")
-    p_infer.add_argument("--model-config", default="configs/DINOv2_vitb14_model_configs.yml")
+    p_infer.add_argument("--model-config", default="configs/DINOv2_large_model_configs.yml")
     p_infer.add_argument("--checkpoint", required=True)
     p_infer.add_argument("--image", required=True)
     p_infer.add_argument("--json")
@@ -143,7 +143,7 @@ def main():
 
     p_export = sub.add_parser("export-onnx")
     p_export.add_argument("--data-config", default="configs/data.yml")
-    p_export.add_argument("--model-config", default="configs/DINOv2_vitb14_model_configs.yml")
+    p_export.add_argument("--model-config", default="configs/DINOv2_large_model_configs.yml")
     p_export.add_argument("--checkpoint", required=True)
     p_export.add_argument("--output", default="model.onnx", help="Output ONNX path")
     p_export.add_argument("--json")

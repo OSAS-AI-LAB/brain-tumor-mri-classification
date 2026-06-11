@@ -12,7 +12,6 @@
 ├── configs/
 │   ├── data.yml
 │   ├── DINOv2_small_model_configs.yml
-│   ├── DINOv2_vitb14_model_configs.yml
 │   ├── DINOv2_large_model_configs.yml
 │   └── DINOv2_giant_model_configs.yml
 ├── src/brain_tumor_mri_classification/

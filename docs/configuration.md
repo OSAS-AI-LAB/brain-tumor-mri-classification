@@ -18,12 +18,11 @@ python apps/cli/main.py train --model-config DINOv2_large_model_configs.yml --lr
 
 ## Model Config Variants
 
-| Config File | Backbone | Embed Dim | Hidden Dim | Batch Size |
-|-------------|----------|-----------|------------|------------|
-| `DINOv2_small_model_configs.yml` | `dinov2_vits14` | 384 | 256 | 32 |
-| `DINOv2_vitb14_model_configs.yml` | `dinov2_vitb14` | 768 | 512 | 16 |
-| `DINOv2_large_model_configs.yml` | `dinov2_vitl14` | 1024 | 768 | 8 |
-| `DINOv2_giant_model_configs.yml` | `dinov2_vitg14` | 1536 | 1024 | 4 |
+| Config File | Backbone | Embed Dim | Hidden Dim | Batch Size | Model URL |
+|-------------|----------|-----------|------------|------------|-----------|
+| `DINOv2_small_model_configs.yml` | `dinov2_vits14` | 384 | 256 | 32 | [facebook/dinov2-small](https://huggingface.co/facebook/dinov2-small) |
+| `DINOv2_large_model_configs.yml` | `dinov2_vitl14` | 1024 | 768 | 8 | [facebook/dinov2-large](https://huggingface.co/facebook/dinov2-large) |
+| `DINOv2_giant_model_configs.yml` | `dinov2_vitg14` | 1536 | 1024 | 4 | [facebook/dinov2-giant](https://huggingface.co/facebook/dinov2-giant) |
 
 ### Common Fields
 

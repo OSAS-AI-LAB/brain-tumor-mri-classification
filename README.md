@@ -9,10 +9,10 @@ pip install -r requirements/requirements-dev.txt
 
 python scripts/download_dataset.py
 python scripts/download_model_checkpoints.py
-python apps/cli/main.py train --model-config DINOv2_vitb14_model_configs.yml
-python apps/cli/main.py evaluate --checkpoint ckpts/dinov2_brain_tumor/best_dinov2_vitb14_brain_tumor.pth --cm confusion.png
-python apps/cli/main.py inference --checkpoint ckpts/dinov2_brain_tumor/best_dinov2_vitb14_brain_tumor.pth --image path/to/mri.jpg
-python apps/cli/main.py export-onnx --checkpoint ckpts/dinov2_brain_tumor/best_dinov2_vitb14_brain_tumor.pth --output model.onnx
+python apps/cli/main.py train --model-config DINOv2_large_model_configs.yml
+python apps/cli/main.py evaluate --checkpoint ckpts/dinov2_brain_tumor/best_dinov2_vitl14_brain_tumor.pth --cm confusion.png
+python apps/cli/main.py inference --checkpoint ckpts/dinov2_brain_tumor/best_dinov2_vitl14_brain_tumor.pth --image path/to/mri.jpg
+python apps/cli/main.py export-onnx --checkpoint ckpts/dinov2_brain_tumor/best_dinov2_vitl14_brain_tumor.pth --output model.onnx
 python apps/gradio_app/main.py
 ```
 

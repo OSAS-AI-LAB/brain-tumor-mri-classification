@@ -9,7 +9,7 @@ Paths are resolved from `configs/` folder automatically.
 
 ```python
 cfg = Config()
-cfg = Config.from_yaml("data.yml", "DINOv2_vitb14_model_configs.yml")
+cfg = Config.from_yaml("data.yml", "DINOv2_large_model_configs.yml")
 cfg = Config.from_yaml(overrides={"epochs": 20})
 ```
 
@@ -19,13 +19,13 @@ cfg = Config.from_yaml(overrides={"epochs": 20})
 | `json_path` | `str` | `data/.../DATA.json` |
 | `img_dir` | `str` | `data/...` |
 | `checkpoint_dir` | `str` | `ckpts/dinov2_brain_tumor` |
-| `best_model_path` | `str` | `ckpts/.../best.pth` |
-| `backbone_name` | `str` | `dinov2_vitb14` |
-| `backbone_cache_path` | `str` | `ckpts/...-dinov2_vitb14` |
-| `hidden_dim` | `int` | 512 |
+| `best_model_path` | `str` | `ckpts/.../best_dinov2_vitl14_brain_tumor.pth` |
+| `backbone_name` | `str` | `dinov2_vitl14` |
+| `backbone_cache_path` | `str` | `ckpts/...-dinov2_vitl14` |
+| `hidden_dim` | `int` | 768 |
 | `dropout` | `float` | 0.4 |
 | `img_size` | `int` | 518 |
-| `batch_size` | `int` | 16 |
+| `batch_size` | `int` | 8 |
 | `epochs` | `int` | 15 |
 | `lr` | `float` | 1e-3 |
 | `weight_decay` | `float` | 1e-4 |
@@ -58,7 +58,7 @@ img, label = ds[0]
 
 ### `DINOv2Classifier`
 ```python
-model = DINOv2Classifier(backbone, num_classes=30, hidden_dim=512, dropout=0.4)
+model = DINOv2Classifier(backbone, num_classes=30, hidden_dim=768, dropout=0.4)
 logits = model(images)
 ```
 

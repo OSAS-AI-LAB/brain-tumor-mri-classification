@@ -1,3 +1,5 @@
+model_url: "https://huggingface.co/facebook/dinov2-giant"
+
 checkpoint:
   checkpoint_dir: "ckpts/dinov2_brain_tumor"
   best_model_path: "ckpts/dinov2_brain_tumor/best_dinov2_vitg14_brain_tumor.pth"
